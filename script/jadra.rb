@@ -1,4 +1,4 @@
-require_relative 'exporter'
+require_relative '../lib/exporter'
 
 UNIT_QUERY = 'select distinct skupina from obce'
 

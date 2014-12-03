@@ -29,8 +29,8 @@ where
 	o1.jadro = \'True\' and o2.jadro = \'True\' and o1.skupina=o2.skupina and o1.skupina=?
   order by o1.region, o1.nazev, o2.nazev'
 
-HEADERS = ['Region', 'KODOB_VYJ', 'NAZOB_VYJ', 'SumOfVYJ_DENNE', 'SumOfDOJ_DENNE', 'KODOB_DOJ', 'NAZOB_DOJ', 'REGION_DOJ', 'Tik', 'Tki', 'Tii', 'Tjk', 'Tkj', 'SumOfTij', 'SumOfTii', 'poměr Tij(sumaTij+sumaTii)', 'poměr Tji/(sumaTij+sumaTii)', 'SMART_Tij', 'SMART_Tji', 'INTRAMAX_Tij', 'INTRA_Tji', 'CURDS_Tij', 'CURDS_Tji']
-FORMULAS = ['=D$i/(N$i+O$i)', '=E$i/(N$i+O$i)', '=(D$i*D$i)/(M$i*I$i)+(E$i*E$i)/(L$i*J$i)', '=(E$i*E$i)/(M$i*I$i)+(D$i*D$i)/(L$i*J$i)', '=D$i/(M$i*I$i)+E$i/(L$i*J$i)', '=E$i/(M$i*I$i)+D$i/(L$i*J$i)', '=D$i/M$i+D$i/I$i+E$i/L$i+E$i/J$i', '=E$i/M$i+E$i/I$i+D$i/L$i+D$i/J$i']
+HEADERS = ['Region', 'KODOB_VYJ', 'NAZOB_VYJ', 'SumOfVYJ_DENNE', 'SumOfDOJ_DENNE', 'KODOB_DOJ', 'NAZOB_DOJ', 'REGION_DOJ', 'Tik', 'Tki', 'Tii', 'Tjk', 'Tkj', 'SumOfTij', 'SumOfTii', 'poměr Tij(sumaTij+sumaTii)', 'poměr Tji/(sumaTij+sumaTii)', 'SMART_Tij', 'SMART_Tji', 'INTRAMAX_Tij', 'INTRA_Tji', 'CURDS_Tij', 'CURDS_Tji', 'SMART_Tij_Norm', 'INTRAMAX_Tij_Norm', 'CURDS_Tij']
+FORMULAS = ['=D$i/(N$i+O$i)', '=E$i/(N$i+O$i)', '=(D$i*D$i)/(M$i*I$i)+(E$i*E$i)/(L$i*J$i)', '=(E$i*E$i)/(M$i*I$i)+(D$i*D$i)/(L$i*J$i)', '=D$i/(M$i*I$i)+E$i/(L$i*J$i)', '=E$i/(M$i*I$i)+D$i/(L$i*J$i)', '=D$i/M$i+D$i/I$i+E$i/L$i+E$i/J$i', '=E$i/M$i+E$i/I$i+D$i/L$i+D$i/J$i', '=(R$i/MAX(R1:R10000))*100', '=(T$i/MAX(T1:T10000))*100', '=(V$i/MAX(V1:V10000))*100']
 
 exporter = Exporter.new 'jadra_sum.xlsx', 'jadra', HEADERS, FORMULAS
 exporter.run 'database.sqlite', UNIT_QUERY, DATA_QUERY

@@ -4,6 +4,7 @@ UNIT_QUERY = 'select distinct skupina from obce'
 
 DATA_QUERY = 'select
 	o1.region as region,
+	(select count(*) from obce obc where obc.jadro = \'True\' and obc.region=o1.region) as pocet_jader,
   kod_from,
 	o1.nazev as o_from,
   suma,
@@ -29,8 +30,68 @@ where
 	o1.jadro = \'True\' and o2.jadro = \'True\' and o1.skupina=o2.skupina and o1.skupina=?
   order by o1.region, o1.nazev, o2.nazev'
 
-HEADERS = ['Region', 'KODOB_VYJ', 'NAZOB_VYJ', 'SumOfVYJ_DENNE', 'SumOfDOJ_DENNE', 'KODOB_DOJ', 'NAZOB_DOJ', 'REGION_DOJ', 'Tik', 'Tki', 'Tii', 'Tjk', 'Tkj', 'SumOfTij', 'SumOfTii', 'poměr Tij(sumaTij+sumaTii)', 'poměr Tji/(sumaTij+sumaTii)', 'SMART_Tij', 'SMART_Tji', 'INTRAMAX_Tij', 'INTRA_Tji', 'CURDS_Tij', 'CURDS_Tji', 'SMART_Tij_Norm', 'INTRAMAX_Tij_Norm', 'CURDS_Tij']
-FORMULAS = ['=D$i/(N$i+O$i)', '=E$i/(N$i+O$i)', '=(D$i*D$i)/(M$i*I$i)+(E$i*E$i)/(L$i*J$i)', '=(E$i*E$i)/(M$i*I$i)+(D$i*D$i)/(L$i*J$i)', '=D$i/(M$i*I$i)+E$i/(L$i*J$i)', '=E$i/(M$i*I$i)+D$i/(L$i*J$i)', '=D$i/M$i+D$i/I$i+E$i/L$i+E$i/J$i', '=E$i/M$i+E$i/I$i+D$i/L$i+D$i/J$i', '=(R$i/MAX(R1:R10000))*100', '=(T$i/MAX(T1:T10000))*100', '=(V$i/MAX(V1:V10000))*100']
+def x(sym)
+	HEADERS.each do |h|
+		if h[0].eql? sym
+			return h[2]
+		end
+	end
+end
 
-exporter = Exporter.new 'jadra_sum.xlsx', 'jadra', HEADERS, FORMULAS
+HEADERS = [
+		[:region, 'Region'],
+		[:pocet_jader, 'Pocet_jader'],
+		[:kod_obce_z, 'KODOB_VYJ'],
+		[:nazev_obce_z, 'NAZOB_VYJ'],
+		[:sum_vyj, 'SumOfVYJ_DENNE'],
+		[:sum_doj, 'SumOfDOJ_DENNE'],
+		[:kod_obce_do, 'KODOB_DOJ'], # f
+		[:nazev_obce_do, 'NAZOB_DOJ'],
+		[:region_do, 'REGION_DOJ'],
+		[:tik, 'Tik'],
+		[:tki, 'Tki'],
+		[:tii, 'Tii'],
+		[:tjk, 'Tjk'],
+		[:tkj, 'Tkj'],
+		[:sum_tij, 'SumOfTij'],
+		[:sum_tii, 'SumOfTii'],
+		# formulas
+		[:pomer_tij, 'poměr Tij(sumaTij+sumaTii)'],
+		[:pomer_tji, 'poměr Tji/(sumaTij+sumaTii)'],
+		[:smart_tij, 'SMART_Tij'],
+		[:smart_tji, 'SMART_Tji'],
+		[:intramax_tij, 'INTRAMAX_Tij'],
+		[:intramax_tji, 'INTRA_Tji'],
+		[:curds_tij, 'CURDS_Tij'],
+		[:curds_tji, 'CURDS_Tji'],
+		[:smart_tij_n, 'SMART_Tij_Norm'],
+		[:intramax_tij_n, 'INTRAMAX_Tij_Norm'],
+		[:curds_tij_n, 'CURDS_Tij_Norm'],
+]
+
+HEADERS.each_index do |idx|
+	a = (idx.div 26) - 1
+	b = idx % 26
+	char = '' if a < 0
+	char = ('A'.ord + a).chr if a >= 0
+	char << ('A'.ord + b).chr
+	HEADERS[idx] << char
+end
+
+
+FORMULAS = [
+		"=#{x :sum_vyj}$i/(#{x :sum_tij}$i+#{x :sum_tii}$i)",
+		"=#{x :sum_doj}$i/(#{x :sum_tij}$i+#{x :sum_tii}$i)",
+		"=(#{x :sum_vyj}$i*#{x :sum_vyj}$i)/(#{x :tkj}$i*#{x :tik}$i)+(#{x :sum_doj}$i*#{x :sum_doj}$i)/(#{x :tjk}$i*#{x :tki}$i)",
+		"=(#{x :sum_doj}$i*#{x :sum_doj}$i)/(#{x :tkj}$i*#{x :tik}$i)+(#{x :sum_vyj}$i*#{x :sum_vyj}$i)/(#{x :tjk}$i*#{x :tki}$i)",
+		"=#{x :sum_vyj}$i/(#{x :tkj}$i*#{x :tik}$i)+#{x :sum_doj}$i/(#{x :tjk}$i*#{x :tki}$i)",
+		"=#{x :sum_doj}$i/(#{x :tkj}$i*#{x :tik}$i)+#{x :sum_vyj}$i/(#{x :tjk}$i*#{x :tki}$i)",
+		"=#{x :sum_vyj}$i/#{x :tkj}$i+#{x :sum_vyj}$i/#{x :tik}$i+#{x :sum_doj}$i/#{x :tjk}$i+#{x :sum_doj}$i/#{x :tki}$i",
+		"=#{x :sum_doj}$i/#{x :tkj}$i+#{x :sum_doj}$i/#{x :tik}$i+#{x :sum_vyj}$i/#{x :tjk}$i+#{x :sum_vyj}$i/#{x :tki}$i",
+		"=(#{x :smart_tij}$i/MAX(#{x :smart_tij}1:#{x :smart_tij}10000))*100",
+		"=(#{x :intramax_tij}$i/MAX(#{x :intramax_tij}1:#{x :intramax_tij}10000))*100",
+		"=(#{x :curds_tij}$i/MAX(#{x :curds_tij}1:#{x :curds_tij}10000))*100"
+]
+
+exporter = Exporter.new 'jadra_sum.xlsx', 'jadra', HEADERS.map {|h| h[1]}, FORMULAS
 exporter.run 'database.sqlite', UNIT_QUERY, DATA_QUERY

@@ -5,6 +5,11 @@ UNIT_QUERY = 'select distinct skupina from obce'
 DATA_QUERY = 'select
 	o1.region as region,
 	(select count(*) from obce obc where obc.jadro = \'True\' and obc.region=o1.region) as pocet_jader,
+	(case when
+			(o1.region < o2.region) or
+			(o1.region = o2.region and o1.nazev < o2.nazev)
+		then 1
+		else 2 end) as smer,
   kod_from,
 	o1.nazev as o_from,
   suma,
@@ -41,6 +46,7 @@ end
 HEADERS = [
 		[:region, 'Region'],
 		[:pocet_jader, 'Pocet_jader'],
+		[:smer, 'Smer'],
 		[:kod_obce_z, 'KODOB_VYJ'],
 		[:nazev_obce_z, 'NAZOB_VYJ'],
 		[:sum_vyj, 'SumOfVYJ_DENNE'],

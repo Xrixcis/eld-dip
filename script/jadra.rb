@@ -81,6 +81,7 @@ HEADERS = [
 		[:smart_tij_n, 'SMART_Tij_Norm'],
 		[:intramax_tij_n, 'INTRAMAX_Tij_Norm'],
 		[:curds_tij_n, 'CURDS_Tij_Norm'],
+		[:kategorie_regionu, 'Kategorie_regionu']
 ]
 
 HEADERS.each_index do |idx|
@@ -104,7 +105,8 @@ FORMULAS = [
 		"=#{x :sum_doj}$i/#{x :tkj}$i+#{x :sum_doj}$i/#{x :tik}$i+#{x :sum_vyj}$i/#{x :tjk}$i+#{x :sum_vyj}$i/#{x :tki}$i",
 		"=(#{x :smart_tij}$i/MAX(#{x :smart_tij}1:#{x :smart_tij}10000))*100",
 		"=(#{x :intramax_tij}$i/MAX(#{x :intramax_tij}1:#{x :intramax_tij}10000))*100",
-		"=(#{x :curds_tij}$i/MAX(#{x :curds_tij}1:#{x :curds_tij}10000))*100"
+		"=(#{x :curds_tij}$i/MAX(#{x :curds_tij}1:#{x :curds_tij}10000))*100",
+		"=(min(#{x :pocet_jader}$i, 3))"
 ]
 
 exporter = Exporter.new 'jadra_sum.xlsx', 'jadra', HEADERS.map {|h| h[1]}, FORMULAS

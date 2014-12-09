@@ -11,7 +11,7 @@ class Parser
     #db.execute('PRAGMA foreign_keys = ON')
 
     # vytvorime tabulky
-    db.execute('create table obce (kod integer primary key, nazev character varying, region character varying, jadro boolean default false, skupina integer default null)')
+    db.execute('create table obce (kod integer primary key, nazev character varying, region character varying, jadro boolean default false, skupina integer default null, pos_x real, pos_y real)')
     db.execute('create table matice (kod_from integer references obce(kod), kod_to integer references obce(kod), suma integer, primary key (kod_from, kod_to))')
     db.execute('create table tiky (kod integer references obce(kod) primary key, tii integer, tik integer, tki integer)')
     db
@@ -61,7 +61,7 @@ class Parser
   end
 
   def handle_obce(row, stmt)
-    stmt.execute(row['ICZUJ'].to_i, row['NAZEV'], row['NAZEV_OBC2'], row['BYLO_JADRE'])
+    stmt.execute(row['ICZUJ'].to_i, row['NAZEV'], row['NAZEV_OBC2'], row['BYLO_JADRE'], row['POINT_X'], row['POINT_Y'])
   end
 
   def handle_matice(row, stmt)
@@ -89,7 +89,7 @@ class Parser
             name: 'obce.dbf',
             handler: Proc.new {|row, stmt| handle_obce row, stmt },
             headers: true,
-            query: 'insert into obce (kod, nazev, region, jadro) values (?,?,?,?)'
+            query: 'insert into obce (kod, nazev, region, jadro, pos_x, pos_y) values (?,?,?,?,?,?)'
         },
         {
             name:'matice.csv',

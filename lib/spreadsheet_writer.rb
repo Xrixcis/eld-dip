@@ -25,6 +25,7 @@ class SpreadsheetWriter
   def add(row)
     rownum = @buff.length + 2
     @buff << (row + @formulas.map {|x| x.gsub(/\$i/, rownum.to_s) })
+    @buff.last
   end
 
   def save(file)

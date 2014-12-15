@@ -14,8 +14,9 @@ class Exporter
   end
 
   def add_row(row)
-    @sum_writer.add row
-    @unit_writer.add row
+    r1 = @sum_writer.add row
+    r2 = @unit_writer.add row
+    [r1, r2]
   end
 
   def new_unit(name)
@@ -52,7 +53,7 @@ class Exporter
     db
   end
 
-  def run(db_file, unit_query, data_query)
+  def run(db_file, unit_query, data_query, &block)
 
     db = read_db db_file
 
@@ -63,9 +64,14 @@ class Exporter
       unit_name = unit_row[0]
       new_unit unit_name
 
+      index = 1
       # spust dotaz a pro kazdy region
       db.execute data_query, unit_name do |row|
-        add_row row
+        rows = add_row row
+        block.call(rows[0], index) unless block.nil?
+        block.call(rows[1], index) unless block.nil?
+
+        index += 1
       end
     end
 

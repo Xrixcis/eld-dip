@@ -16,10 +16,11 @@ end
 
 class SpreadsheetWriter
 
-  def initialize(headers, formulas)
+  def initialize(headers, formulas, sheet2)
     @buff = []
     @formulas = formulas
     @headers = headers
+    @sheet2 = sheet2
   end
 
   def add(row)
@@ -33,6 +34,10 @@ class SpreadsheetWriter
     sheet = doc.add_sheet 'sheet 1'
     sheet.add_row @headers
     @buff.each { |row| sheet.add_row row }
+    unless @sheet2.nil?
+      sheet = doc.add_sheet @sheet2[:name]
+      @sheet2[:data].each {|row| sheet.add_row row}
+    end
     FileUtils.mv doc.path, file
     doc.cleanup
   end

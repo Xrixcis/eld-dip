@@ -3,14 +3,15 @@ require 'sqlite3'
 
 class Exporter
 
-  def initialize(sum_result_file, unit_results_dir, headers, formulas)
+  def initialize(sum_result_file, unit_results_dir, headers, formulas, sheet2 = nil)
     @sum_file = sum_result_file
     @unit_dir = unit_results_dir
 
     @headers = headers
     @formulas = formulas
+    @sheet2 = sheet2
 
-    @sum_writer = SpreadsheetWriter.new @headers, @formulas
+    @sum_writer = SpreadsheetWriter.new @headers, @formulas, @sheet2
   end
 
   def add_row(row)
@@ -21,7 +22,7 @@ class Exporter
 
   def new_unit(name)
     write_unit unless @unit_writer.nil?
-    @unit_writer = SpreadsheetWriter.new @headers, @formulas
+    @unit_writer = SpreadsheetWriter.new @headers, @formulas, @sheet2
     @unit_name = name
   end
 
@@ -53,7 +54,7 @@ class Exporter
     db
   end
 
-  def run(db_file, unit_query, data_query, &block)
+  def run(db_file, unit_query, data_query, sheet2 = nil, &block)
 
     db = read_db db_file
 
@@ -64,14 +65,11 @@ class Exporter
       unit_name = unit_row[0]
       new_unit unit_name
 
-      index = 1
       # spust dotaz a pro kazdy region
       db.execute data_query, unit_name do |row|
         rows = add_row row
-        block.call(rows[0], index) unless block.nil?
-        block.call(rows[1], index) unless block.nil?
-
-        index += 1
+        block.call(rows[0]) unless block.nil?
+        block.call(rows[1]) unless block.nil?
       end
     end
 

@@ -48,7 +48,7 @@ from
 	join obce o1 on (m.kod_from = o1.kod)
 	join obce o2 on (m.kod_to = o2.kod)
 where
-	o1.jadro = \'True\' and o2.jadro = \'True\' and 1=?
+	o1.jadro = \'True\' and o2.jadro = \'True\' and o1.region=o2.region and 1=?
   order by o1.region, o1.nazev, o2.nazev'
 
 def x(sym)
@@ -130,7 +130,7 @@ FORMULAS = [
 		"=#{x :sum_doj}$i/#{x :tkj}$i+#{x :sum_doj}$i/#{x :tik}$i+#{x :sum_vyj}$i/#{x :tjk}$i+#{x :sum_vyj}$i/#{x :tki}$i",
 		# "=(#{x :smart_tij}$i/MAX(#{x :smart_tij}1:#{x :smart_tij}10000))*100",
 		# "=(#{x :intramax_tij}$i/MAX(#{x :intramax_tij}1:#{x :intramax_tij}10000))*100",
-		"=(#{x :curds_tij}$i/MAX(#{x :curds_tij}1:#{x :curds_tij}100000))*100"
+		"=(#{x :curds_tij}$i/regiony!$F$1)*100"
 ]
 
 def get_regiony
@@ -173,7 +173,7 @@ def create_sheet2
 	data
 end
 
-exporter = Exporter.new 'all_sum.xlsx', 'all', HEADERS.map {|h| h[1]}, FORMULAS, {name: 'regiony', data: create_sheet2}
+exporter = Exporter.new 'all_per_region_sum.xlsx', 'all_per_region', HEADERS.map {|h| h[1]}, FORMULAS, {name: 'regiony', data: create_sheet2}
 exporter.run('database.sqlite', UNIT_QUERY, DATA_QUERY) do |row|
-	row << "=(regiony!$C$#{REGIONY[row[0]][:index]+1})"
+	row << "=regiony!$C$#{REGIONY[row[0]][:index]+1}"
 end

@@ -54,7 +54,7 @@ class Exporter
     db
   end
 
-  def run(db_file, unit_query, data_query, sheet2 = nil, &block)
+  def run(db_file, unit_query, data_query, &block)
 
     db = read_db db_file
 

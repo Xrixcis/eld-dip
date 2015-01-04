@@ -107,10 +107,10 @@ select
 				o1.jadro = \'True\' and o2.jadro = \'True\' and 1=?
   			order by o1.region, o1.nazev, o2.nazev))'
 
-def x(sym)
+def x(sym, i = true)
 	HEADERS.each do |h|
 		if h[0].eql? sym
-			return h[2] + '$i'
+			return h[2] + (i ? '$i' : '')
 		end
 	end
 end
@@ -163,13 +163,12 @@ HEADERS.each_index do |idx|
 end
 
 FORMULAS = [
-		"=(if(min(#{x :curds_tij}/#{x :curds_tji};#{x :curds_tji}/#{x :curds_tij}) &lt;= setup!$B$1 &amp; #{x :level_i}=#{x :level_j};1;
-				if(min(#{x :curds_tij}/#{x :curds_tji};#{x :curds_tji}/#{x :curds_tij}) &gt; setup!$B$2 &amp; #{x :level_i} = #{x :level_j}; 2;
-					if(min(#{x :curds_tij}/#{x :curds_tji};#{x :curds_tji}/#{x :curds_tij}) &lt;= setup!$B$1 &amp; #{x :level_i} &lt;&gt; #{x :level_j}; 3;
-						4
-		))))".gsub(/\s+/, ' '),
-		"=(#{x :curds_tij}$i/MAX(#{x :curds_tij}1:#{x :curds_tij}100000))*100"
+		"=IF(MIN(#{x :curds_tij}/#{x :curds_tji},#{x :curds_tji}/#{x :curds_tij}) &gt;= 0.7,
+				IF(AND(#{x :curds_tij} &lt; 0.2, #{x :curds_tji} &lt; 0.2),1,2),
+				IF(AND(MIN(#{x :curds_tij},#{x :curds_tji}) &lt;= 0.2, MAX(#{x :curds_tij},#{x :curds_tji}) &gt;= 0.2), 3, 1)
+		)".gsub(/\s+/, ''),
+		"=(#{x :curds_tij}/MAX(#{x :curds_tij}:#{x :curds_tij, false}100000))*100"
 ]
 
-exporter = Exporter.new 'all_sum.xlsx', 'all', HEADERS.map {|h| h[1]}, FORMULAS, {name: 'setup', data: [['Koeficient <=:', '0.5'], ['Koeficient >:', '0.5']]}
+exporter = Exporter.new 'all_sum.xlsx', 'all', HEADERS.map {|h| h[1]}, FORMULAS#, {name: 'setup', data: [['Koeficient <=:', '0'], ['Koeficient >:', '0']]}
 exporter.run('database.sqlite', UNIT_QUERY, DATA_QUERY)

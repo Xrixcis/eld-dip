@@ -6,7 +6,7 @@ class XlsxWriter
       if empty?
         %{<c r="#{Cell.column_letter(x)}#{y}" s="0" t="s" />}
       elsif (value =~ /=/) == 0
-        %{<c r="#{Cell.column_letter(x)}#{y}" s="#{Cell.style_number(type, faded?)}" t="#{Cell.type_name(type)}"><f>#{value}</f></c>}
+        %{<c r="#{Cell.column_letter(x)}#{y}" s="#{Cell.style_number(type, faded?)}" t="#{Cell.type_name(type)}"><f>#{value.slice(1, value.size)}</f></c>}
       else
         %{<c r="#{Cell.column_letter(x)}#{y}" s="#{Cell.style_number(type, faded?)}" t="#{Cell.type_name(type)}"><v>#{escaped_value}</v></c>}
       end

@@ -24,7 +24,7 @@ exporter.run('database2.sqlite',
                 sum(obyvatel) as obyvatel,
                 sum(area) as rozloha,
                 sum(tki) as tki,
-                count(jadro) as jader
+                sum((case when jadro = \'True\' then 1 else 0 end)) as jader
               from (select
                      area,
                      obyvatel,
@@ -40,7 +40,7 @@ exporter.run('database2.sqlite',
              'select region,
                 sum(obyvatel) as obyvatel,
                 sum(area) as rozloha,
-                count(jadro) as jader,
+                sum((case when jadro = \'True\' then 1 else 0 end)) as jader,
                 katreg,
                 sum(tki) as tki
               from (select

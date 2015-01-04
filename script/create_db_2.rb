@@ -67,14 +67,6 @@ class Parser
     stmt.execute(row[0].to_i, row[4].to_i, row[2].to_i, row[3].to_i, row[5])
   end
 
-  def handle_regiony(row, stmt)
-    @i ||= 1
-    row.each do |obec|
-      stmt.execute(@i, obec) unless obec.nil? or obec.empty?
-    end
-    @i = @i + 1
-  end
-
   def handle_obce_xls(row, stmt)
     stmt.execute(row[0].to_f, row[1].to_i, row[4].to_i, row[2].to_i)
   end
@@ -111,6 +103,8 @@ class Parser
       read_rows "data2/#{file[:name]}", file[:headers] do |row|
         db.prepare file[:query] do |stmt|
           file[:handler].call row, stmt
+          affected = db.changes
+          raise StandardError, "Unexpected count of changes: #{affected}" unless affected == 1
         end
       end
     end
